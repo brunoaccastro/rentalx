@@ -12,9 +12,9 @@ export class CreateCategories1636674537677 implements MigrationInterface {
             // length: "36",
             // isPrimary: true,
             name: "id",
-            type: "varchar",
+            type: "uuid",
             isPrimary: true,
-            generationStrategy: "uuid",
+            // generationStrategy: "uuid",
           },
           {
             name: "name",
