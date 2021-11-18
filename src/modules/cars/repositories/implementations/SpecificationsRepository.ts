@@ -1,45 +1,38 @@
 /* eslint-disable no-use-before-define */
-import { Specification } from "../../model/Specification";
+
+import { getRepository, Repository } from "typeorm";
+
+import { Specification } from "../../entities/Specification";
 import {
   ICreateSpecificationDTO,
   ISpecificationsRepository,
 } from "../ISpecificationsRepository";
 
 class SpecificationRepository implements ISpecificationsRepository {
-  private specifications: Specification[];
+  private specifications: Repository<Specification>;
 
-  private static INSTANCE: SpecificationRepository;
-
-  private constructor() {
-    this.specifications = [];
+  constructor() {
+    this.specifications = getRepository(Specification);
   }
 
-  public static getInstance(): SpecificationRepository {
-    if (!SpecificationRepository.INSTANCE) {
-      SpecificationRepository.INSTANCE = new SpecificationRepository();
-    }
+  async create({ name, description }: ICreateSpecificationDTO): Promise<void> {
+    const specification = this.specifications.create({
+      name,
+      description,
+    });
 
-    return SpecificationRepository.INSTANCE;
+    await this.specifications.save(specification);
   }
 
-  create({ name, description }: ICreateSpecificationDTO): void {
-    const specification = new Specification();
-
-    Object.assign(specification, { name, description });
-
-    this.specifications.push(specification);
-  }
-
-  findByName(name: string): Specification {
-    const specification = this.specifications.find(
-      (specification) => specification.name === name
-    );
+  async findByName(name: string): Promise<Specification> {
+    const specification = await this.specifications.findOne({ name });
 
     return specification;
   }
 
-  listAll(): Specification[] {
-    return this.specifications;
+  async listAll(): Promise<Specification[]> {
+    const specifications = await this.specifications.find();
+    return specifications;
   }
 }
 
